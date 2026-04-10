@@ -1,7 +1,7 @@
-🕒 Gestor de Horas de Estágio
+🕒 Gestor de Horas de Estágio                 
 Uma ferramenta simples, intuitiva e interativa desenvolvida em HTML, CSS e JavaScript puro para ajudar estudantes a gerenciarem suas horas de estágio. Chega de fazer contas complexas na mão para descobrir quando você finalmente vai bater a sua meta de horas!
 
-✨ Principais Funcionalidades
+✨ Principais Funcionalidades                
 Previsão Exata: Insira a carga horária total exigida (ex: 260h, 300h) e a data de início para descobrir a data exata de término do seu estágio.
 
 Configuração de Turnos: Defina seus horários de entrada e saída (com suporte a até 2 turnos por dia) para cada dia da semana.
