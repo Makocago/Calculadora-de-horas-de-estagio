@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de Estágio com Calendário e Alertas</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7f6;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      .container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        max-width: 800px;
+        width: 100%;
+      }
+      h2 {
+        text-align: center;
+        color: #2c3e50;
+        margin-top: 0;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #555;
+      }
+      input[type="number"],
+      input[type="date"],
+      input[type="time"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 15px;
+      }
+      input[type="number"],
+      input[type="date"] {
+        width: 100%;
+      }
+
+      /* Estilos dos Dias da Semana */
+      .dias-semana {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #eee;
+      }
+      .dia-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        padding: 10px 15px;
+      }
+      .dia-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .dia-header-left {
+        display: flex;
+        align-items: center;
+      }
+      .dia-header input[type="checkbox"] {
+        transform: scale(1.3);
+        margin-right: 12px;
+        cursor: pointer;
+      }
+      .dia-header label {
+        margin-bottom: 0;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .dia-total {
+        font-weight: bold;
+        color: #2980b9;
+        background-color: #ebf5fb;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+      .turnos-container {
+        display: none;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed #ccc;
+      }
+      .turno-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 14px;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .turno-row > span {
+        width: 60px;
+        font-weight: 500;
+      }
+      .inputs-area {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+
+      /* Estilos dos Botões */
+      .btn-gerar {
+        width: 100%;
+        padding: 14px;
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 10px;
+      }
+      .btn-gerar:hover {
+        background-color: #219653;
+      }
+
+      .btn-limpar {
+        background: none;
+        border: none;
+        color: #e74c3c;
+        cursor: pointer;
+        font-size: 13px;
+        padding: 2px 5px;
+        text-decoration: underline;
+        margin-left: 5px;
+      }
+      .btn-limpar:hover {
+        color: #c0392b;
+        text-decoration: none;
+      }
+
+      /* Resultados e Calendário */
+      #resultado-resumo {
+        margin-top: 25px;
+        padding: 15px;
+        background-color: #e8f8f5;
+        border-left: 5px solid #1abc9c;
+        border-radius: 4px;
+        display: none;
+      }
+      #resultado-resumo p {
+        margin: 8px 0;
+        font-size: 15px;
+      }
+
+      /* Estilos dos Alertas da Lei do Estágio */
+      .box-avisos {
+        margin-top: 15px;
+        padding: 12px 15px;
+        background-color: #fff3cd;
+        border-left: 5px solid #ffc107;
+        border-radius: 4px;
+        color: #856404;
+        font-size: 14px;
+      }
+      .box-avisos h4 {
+        margin: 0 0 8px 0;
+        color: #d39e00;
+      }
+      .box-avisos ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .box-avisos li {
+        margin-bottom: 5px;
+      }
+
+      #area-calendario {
+        display: none;
+        margin-top: 30px;
+      }
+      .legenda {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 20px;
+        font-size: 14px;
+        flex-wrap: wrap;
+      }
+      .legenda-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .cor-box {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+      }
+      .cor-verde {
+        background-color: #d5f5e3;
+        border-color: #2ecc71;
+      }
+      .cor-vermelha {
+        background-color: #fadbd8;
+        border-color: #e74c3c;
+      }
+      .cor-cinza {
+        background-color: #f9f9f9;
+      }
+
+      .calendario-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      .mes-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .mes-titulo {
+        background-color: #2c3e50;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+        text-transform: capitalize;
+      }
+      .dias-cabecalho {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        background-color: #ecf0f1;
+        text-align: center;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 5px 0;
+        color: #7f8c8d;
+      }
+      .dias-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background-color: #eee;
+        padding: 1px;
+      }
+      .dia-celula {
+        background-color: #fff;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        position: relative;
+        user-select: none;
+      }
+
+      .dia-trabalho {
+        background-color: #d5f5e3;
+        color: #1e8449;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .dia-trabalho:hover {
+        background-color: #abebc6;
+        transform: scale(1.05);
+        z-index: 1;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      }
+      .dia-falta {
+        background-color: #fadbd8;
+        color: #c0392b;
+        font-weight: bold;
+        text-decoration: line-through;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .dia-falta:hover {
+        background-color: #f5b7b1;
+        transform: scale(1.05);
+        z-index: 1;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      }
+      .dia-vazio {
+        background-color: #fafafa;
+      }
+      .dia-neutro {
+        color: #bdc3c7;
+        background-color: #f9f9f9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Gestor de Horas de Estágio</h2>
+
+      <div class="form-group">
+        <label for="total-horas">Carga horária total exigida (Horas):</label>
+        <input type="number" id="total-horas" min="1" placeholder="Ex: 300" />
+      </div>
+
+      <div class="form-group">
+        <label for="data-inicio">Data de início do estágio:</label>
+        <input type="date" id="data-inicio" />
+      </div>
+
+      <div class="form-group">
+        <label>Selecione os dias e horários (Turno 1 e 2):</label>
+        <div class="dias-semana" id="lista-dias"></div>
+      </div>
+
+      <button class="btn-gerar" onclick="iniciarCalculo()">
+        Gerar Calendário e Previsão
+      </button>
+
+      <div id="resultado-resumo"></div>
+
+      <div id="area-calendario">
+        <h3 style="text-align: center; margin-bottom: 5px">
+          Seu Calendário de Estágio
+        </h3>
+        <p
+          style="
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 0;
+          "
+        >
+          Clique nos dias verdes para marcar feriados/faltas. O cálculo será
+          refeito na hora!
+        </p>
+
+        <div class="legenda">
+          <div class="legenda-item">
+            <div class="cor-box cor-verde"></div>
+            Dia de Estágio
+          </div>
+          <div class="legenda-item">
+            <div class="cor-box cor-vermelha"></div>
+            Falta / Feriado
+          </div>
+          <div class="legenda-item">
+            <div class="cor-box cor-cinza"></div>
+            Sem Expediente
+          </div>
+        </div>
+
+        <div class="calendario-grid" id="calendario-container"></div>
+      </div>
+    </div>
+
+    <script>
+      const diasNome = [
+        "Domingo",
+        "Segunda-feira",
+        "Terça-feira",
+        "Quarta-feira",
+        "Quinta-feira",
+        "Sexta-feira",
+        "Sábado",
+      ];
+      const ordemExibicao = [1, 2, 3, 4, 5, 6, 0];
+      const listaDiasContainer = document.getElementById("lista-dias");
+
+      let diasFalta = new Set();
+
+      // Cria a interface dos dias
+      ordemExibicao.forEach((diaIndex) => {
+        const diaCard = document.createElement("div");
+        diaCard.className = "dia-card";
+        diaCard.innerHTML = `
+            <div class="dia-header">
+                <div class="dia-header-left">
+                    <input type="checkbox" id="chk-${diaIndex}" onchange="toggleTurnos(${diaIndex})">
+                    <label for="chk-${diaIndex}">${diasNome[diaIndex]}</label>
+                </div>
+                <div class="dia-total" id="total-texto-${diaIndex}">0h</div>
+            </div>
+            <div class="turnos-container" id="turnos-${diaIndex}">
+                <div class="turno-row">
+                    <span>Turno 1:</span>
+                    <div class="inputs-area">
+                        <input type="time" id="t1-ent-${diaIndex}" onchange="atualizarHorasDia(${diaIndex})"> às 
+                        <input type="time" id="t1-sai-${diaIndex}" onchange="atualizarHorasDia(${diaIndex})">
+                        <button type="button" class="btn-limpar" onclick="limparTurno(${diaIndex}, 1)">Limpar</button>
+                    </div>
+                </div>
+                <div class="turno-row">
+                    <span>Turno 2:</span>
+                    <div class="inputs-area">
+                        <input type="time" id="t2-ent-${diaIndex}" onchange="atualizarHorasDia(${diaIndex})"> às 
+                        <input type="time" id="t2-sai-${diaIndex}" onchange="atualizarHorasDia(${diaIndex})">
+                        <button type="button" class="btn-limpar" onclick="limparTurno(${diaIndex}, 2)">Limpar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        listaDiasContainer.appendChild(diaCard);
+      });
+
+      function toggleTurnos(diaIndex) {
+        const chk = document.getElementById(`chk-${diaIndex}`);
+        const turnosDiv = document.getElementById(`turnos-${diaIndex}`);
+        if (chk.checked) {
+          turnosDiv.style.display = "block";
+          if (!document.getElementById(`t1-ent-${diaIndex}`).value)
+            document.getElementById(`t1-ent-${diaIndex}`).value = "08:00";
+          if (!document.getElementById(`t1-sai-${diaIndex}`).value)
+            document.getElementById(`t1-sai-${diaIndex}`).value = "12:00";
+          if (!document.getElementById(`t2-ent-${diaIndex}`).value)
+            document.getElementById(`t2-ent-${diaIndex}`).value = "14:00";
+          if (!document.getElementById(`t2-sai-${diaIndex}`).value)
+            document.getElementById(`t2-sai-${diaIndex}`).value = "16:00";
+        } else {
+          turnosDiv.style.display = "none";
+        }
+        atualizarHorasDia(diaIndex);
+      }
+
+      // Função para limpar os horários de um turno específico
+      function limparTurno(diaIndex, turnoNumero) {
+        document.getElementById(`t${turnoNumero}-ent-${diaIndex}`).value = "";
+        document.getElementById(`t${turnoNumero}-sai-${diaIndex}`).value = "";
+        atualizarHorasDia(diaIndex); // Recalcula o total do dia após limpar
+      }
+
+      function calcularDiferenca(entrada, saida) {
+        if (!entrada || !saida) return 0;
+        const [entH, entM] = entrada.split(":").map(Number);
+        const [saiH, saiM] = saida.split(":").map(Number);
+        let diferenca = saiH * 60 + saiM - (entH * 60 + entM);
+        if (diferenca < 0) diferenca += 24 * 60;
+        return diferenca / 60;
+      }
+
+      function obterHorasDoDia(diaIndex) {
+        const chk = document.getElementById(`chk-${diaIndex}`);
+        if (!chk || !chk.checked) return 0;
+        return (
+          calcularDiferenca(
+            document.getElementById(`t1-ent-${diaIndex}`).value,
+            document.getElementById(`t1-sai-${diaIndex}`).value,
+          ) +
+          calcularDiferenca(
+            document.getElementById(`t2-ent-${diaIndex}`).value,
+            document.getElementById(`t2-sai-${diaIndex}`).value,
+          )
+        );
+      }
+
+      function atualizarHorasDia(diaIndex) {
+        let totalHoras = obterHorasDoDia(diaIndex);
+        let horasInt = Math.floor(totalHoras);
+        let minutos = Math.round((totalHoras - horasInt) * 60);
+        document.getElementById(`total-texto-${diaIndex}`).innerText =
+          minutos > 0 ? `${horasInt}h${minutos}m` : `${horasInt}h`;
+      }
+
+      function dataParaString(data) {
+        return (
+          data.getFullYear() +
+          "-" +
+          String(data.getMonth() + 1).padStart(2, "0") +
+          "-" +
+          String(data.getDate()).padStart(2, "0")
+        );
+      }
+
+      function alternarFalta(dataStr) {
+        if (diasFalta.has(dataStr)) {
+          diasFalta.delete(dataStr);
+        } else {
+          diasFalta.add(dataStr);
+        }
+        iniciarCalculo();
+      }
+
+      function iniciarCalculo() {
+        const totalHoras = parseFloat(
+          document.getElementById("total-horas").value,
+        );
+        const dataInicioStr = document.getElementById("data-inicio").value;
+        const resultadoDiv = document.getElementById("resultado-resumo");
+        const areaCalendario = document.getElementById("area-calendario");
+
+        if (!totalHoras || !dataInicioStr) {
+          alert("Preencha a carga horária e a data de início.");
+          return;
+        }
+
+        const horasPorDia = {};
+        let horasSemanais = 0;
+        let avisosLegais = [];
+
+        for (let i = 0; i <= 6; i++) {
+          const chk = document.getElementById(`chk-${i}`);
+          if (chk && chk.checked) {
+            let horasDia = obterHorasDoDia(i);
+            horasPorDia[i] = horasDia;
+            horasSemanais += horasDia;
+
+            if (horasDia > 6) {
+              avisosLegais.push(
+                `<strong>${diasNome[i]}:</strong> Carga diária excede o limite de 6h (Total: ${horasDia.toFixed(1)}h).`,
+              );
+            }
+
+            if (horasDia > 4) {
+              const t1Sai = document.getElementById(`t1-sai-${i}`).value;
+              const t2Ent = document.getElementById(`t2-ent-${i}`).value;
+              let intervalo = calcularDiferenca(t1Sai, t2Ent);
+
+              if (intervalo < 0.25) {
+                avisosLegais.push(
+                  `<strong>${diasNome[i]}:</strong> Jornadas acima de 4h exigem intervalo mínimo de 15 min.`,
+                );
+              }
+            }
+          } else {
+            horasPorDia[i] = 0;
+          }
+        }
+
+        if (horasSemanais === 0) {
+          alert("Selecione os dias e turnos de estágio.");
+          return;
+        }
+
+        if (horasSemanais > 30) {
+          avisosLegais.push(
+            `<strong>Carga Semanal:</strong> O total de ${horasSemanais}h excede o limite de 30h semanais.`,
+          );
+        }
+
+        let dataAtual = new Date(dataInicioStr + "T12:00:00");
+        let horasAcumuladas = 0;
+        let diasTrabalhados = 0;
+        let timelineCalendario = [];
+
+        while (horasAcumuladas < totalHoras) {
+          let diaDaSemana = dataAtual.getDay();
+          let dataStr = dataParaString(dataAtual);
+          let horasHoje = horasPorDia[diaDaSemana];
+
+          let diaObjeto = {
+            dataStr: dataStr,
+            data: new Date(dataAtual),
+            dia: dataAtual.getDate(),
+            mes: dataAtual.getMonth(),
+            ano: dataAtual.getFullYear(),
+            status: "neutro",
+          };
+
+          if (horasHoje > 0) {
+            if (diasFalta.has(dataStr)) {
+              diaObjeto.status = "falta";
+            } else {
+              diaObjeto.status = "trabalho";
+              horasAcumuladas += horasHoje;
+              diasTrabalhados++;
+            }
+          }
+
+          timelineCalendario.push(diaObjeto);
+
+          if (horasAcumuladas >= totalHoras) {
+            break;
+          }
+          dataAtual.setDate(dataAtual.getDate() + 1);
+        }
+
+        // Formatação dos Textos do Resumo
+        const dataFinalFormatada = new Intl.DateTimeFormat("pt-BR").format(
+          dataAtual,
+        );
+
+        let hSemInt = Math.floor(horasSemanais);
+        let mSemInt = Math.round((horasSemanais - hSemInt) * 60);
+        let textoSemanal =
+          mSemInt > 0 ? `${hSemInt}h${mSemInt}m` : `${hSemInt}h`;
+
+        // Cálculo das horas totais acumuladas
+        let hTotalInt = Math.floor(horasAcumuladas);
+        let mTotalInt = Math.round((horasAcumuladas - hTotalInt) * 60);
+        let textoTotalAcumulado =
+          mTotalInt > 0 ? `${hTotalInt}h${mTotalInt}m` : `${hTotalInt}h`;
+
+        let htmlResumo = `
+            <p><strong>Carga horária semanal:</strong> ${textoSemanal}</p>
+            <p><strong>Dias efetivos trabalhados:</strong> ${diasTrabalhados} dias</p>
+            <p><strong>Faltas/Feriados marcados:</strong> ${diasFalta.size} dias</p>
+            <p><strong>Total de horas realizadas (na data final):</strong> ${textoTotalAcumulado}</p>
+            <p><strong>Data de término exata:</strong> <span style="font-size: 20px; color: #16a085; font-weight:bold;">${dataFinalFormatada}</span></p>
+        `;
+
+        if (avisosLegais.length > 0) {
+          let listHTML = avisosLegais
+            .map((aviso) => `<li>${aviso}</li>`)
+            .join("");
+          htmlResumo += `
+                <div class="box-avisos">
+                    <h4>⚠️ Alerta: Regras da Lei do Estágio</h4>
+                    <ul>${listHTML}</ul>
+                    <p style="margin-top: 8px; margin-bottom: 0; font-size: 12px; font-style: italic;">Nota: O calendário foi gerado normalmente, este é apenas um aviso informativo.</p>
+                </div>
+            `;
+        }
+
+        resultadoDiv.style.display = "block";
+        resultadoDiv.innerHTML = htmlResumo;
+
+        areaCalendario.style.display = "block";
+        renderizarCalendario(timelineCalendario);
+      }
+
+      function renderizarCalendario(timeline) {
+        const container = document.getElementById("calendario-container");
+        container.innerHTML = "";
+
+        const meses = {};
+        timeline.forEach((dia) => {
+          const chaveMes = `${dia.ano}-${dia.mes}`;
+          if (!meses[chaveMes]) meses[chaveMes] = [];
+          meses[chaveMes].push(dia);
+        });
+
+        const nomeMeses = [
+          "Janeiro",
+          "Fevereiro",
+          "Março",
+          "Abril",
+          "Maio",
+          "Junho",
+          "Julho",
+          "Agosto",
+          "Setembro",
+          "Outubro",
+          "Novembro",
+          "Dezembro",
+        ];
+
+        for (const [chave, diasDoMes] of Object.entries(meses)) {
+          const [ano, mesStr] = chave.split("-");
+          const mes = parseInt(mesStr);
+
+          const mesCard = document.createElement("div");
+          mesCard.className = "mes-card";
+
+          let htmlMes = `
+                <div class="mes-titulo">${nomeMeses[mes]} ${ano}</div>
+                <div class="dias-cabecalho">
+                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                </div>
+                <div class="dias-grid">
+            `;
+
+          const primeiroDiaDoMes = new Date(ano, mes, 1).getDay();
+          for (let i = 0; i < primeiroDiaDoMes; i++) {
+            htmlMes += `<div class="dia-celula dia-vazio"></div>`;
+          }
+
+          const ultimoDiaDoMes = new Date(ano, mes + 1, 0).getDate();
+
+          for (let diaAtual = 1; diaAtual <= ultimoDiaDoMes; diaAtual++) {
+            const diaEncontrado = diasDoMes.find((d) => d.dia === diaAtual);
+
+            if (diaEncontrado) {
+              let classeAdicional = "";
+              let onClick = "";
+
+              if (diaEncontrado.status === "trabalho") {
+                classeAdicional = "dia-trabalho";
+                onClick = `onclick="alternarFalta('${diaEncontrado.dataStr}')" title="Clique para marcar falta"`;
+              } else if (diaEncontrado.status === "falta") {
+                classeAdicional = "dia-falta";
+                onClick = `onclick="alternarFalta('${diaEncontrado.dataStr}')" title="Clique para desmarcar falta"`;
+              } else {
+                classeAdicional = "dia-neutro";
+              }
+
+              htmlMes += `<div class="dia-celula ${classeAdicional}" ${onClick}>${diaAtual}</div>`;
+            } else {
+              htmlMes += `<div class="dia-celula dia-neutro" style="opacity: 0.5;">${diaAtual}</div>`;
+            }
+          }
+
+          htmlMes += `</div></div>`;
+          mesCard.innerHTML = htmlMes;
+          container.appendChild(mesCard);
+        }
+      }
+    </script>
+  </body>
+</html>
